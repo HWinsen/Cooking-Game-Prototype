@@ -12,7 +12,7 @@ namespace Harryanto.CookingGame.Customer
 
         public float Patience = 10f;
         [SerializeField] protected float GoldMultiplier;
-        protected float MoveSpeed = 5f;
+        [SerializeField] protected float MoveSpeed = 2f;
         protected Transform Destination;
         protected Vector3 DestinationPosition;
         protected Vector3[] SpawnPoint =

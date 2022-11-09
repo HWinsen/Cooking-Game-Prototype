@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6043586155466282092}
   - component: {fileID: 6043586155466282093}
   m_Layer: 0
-  m_Name: Customer
+  m_Name: NormalCustomer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -97,5 +97,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c847319675727e4cb72b0f4bc48f08e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Patience: 2
+  Patience: 10
   GoldMultiplier: 1
+  MoveSpeed: 2
