@@ -8,7 +8,6 @@ namespace Harryanto.CookingGame.ObjectPooling
     {
         public int AmountToPool;
         List<IPoolObject> _storedList = new List<IPoolObject>();
-        List<IPoolObject> _spawnedList = new List<IPoolObject>();
         int _spawned = 0;
 
         public PoolingSystem(int AmountToPool = 10)
@@ -19,7 +18,7 @@ namespace Harryanto.CookingGame.ObjectPooling
         public IPoolObject CreateObject(IPoolObject objectPrefab, Vector3 spawnPosition, Transform parent = null)
         {
             IPoolObject outObject;
-            if (_spawned < AmountToPool /*|| _storedList.Peek().gameObject == null*/)
+            if (_spawned < AmountToPool)
             {
                 outObject = MonoBehaviour.Instantiate(objectPrefab.gameObject).
                 GetComponent<IPoolObject>();
@@ -34,15 +33,9 @@ namespace Harryanto.CookingGame.ObjectPooling
             outObject.transform.position = spawnPosition;
             outObject.transform.parent = parent;
 
-
             outObject.gameObject.SetActive(true);
 
-            //_spawnedList.Add(outObject);
-            
-
-            //Debug.Log("Stored: " + _storedList.Count + " Spawned: " + _spawnedList.Count);
             return outObject;
-
         }
 
         // Overload with Rotation
@@ -68,11 +61,7 @@ namespace Harryanto.CookingGame.ObjectPooling
 
             outObject.gameObject.SetActive(true);
 
-            //_spawnedList.Add(outObject);
-
-
             return outObject;
-
         }
 
         public void Store(IPoolObject poolObject)
