@@ -7,8 +7,12 @@ namespace Harryanto.CookingGame.Customer
 {
     public class CustomerSpawner : MonoBehaviour
     {
+        public delegate void CustomerSpawnerDelegate(BaseCustomer baseCustomer);
+        public static event CustomerSpawnerDelegate OnCustomerSpawned;
+
         private PoolingSystem _customerPool = new(10);
         [SerializeField] private BaseCustomer[] _customerPrefabList;
+        [SerializeField] private int _totalCustomerToSpawn;
         [SerializeField] private float _spawnDuration;
         private Vector3[] _spawnPoint =
         {
@@ -16,11 +20,10 @@ namespace Harryanto.CookingGame.Customer
             new Vector3(12, 0, 0),
         };
         [SerializeField] private Transform[] _stallSlotList;
+        [SerializeField] private GameObject[] _customerStatus;
         private bool[] _stallSlotListAlloted = new bool[4];
         private List<BaseCustomer> _customerList = new();
         private float _spawnTimer = 0f;
-
-        [SerializeField] private int _totalCustomerToSpawn;
 
         private void OnEnable()
         {
@@ -60,13 +63,12 @@ namespace Harryanto.CookingGame.Customer
             int randomPoint = Random.Range(0, _spawnPoint.Length);
 
             IPoolObject spawnedCustomer = _customerPool.CreateObject(_customerPrefabList[randomPrefab], _spawnPoint[randomPoint]);
-            BaseCustomer baseSpawnedCustomer = spawnedCustomer.gameObject.GetComponent<BaseCustomer>();
 
             List<int> randomTransformIndex = new();
 
             for (int i = 0; i < _stallSlotListAlloted.Length; i++)
             {
-                if (_stallSlotListAlloted[i] == false)
+                if (!_stallSlotListAlloted[i])
                 {
                     randomTransformIndex.Add(i);
                 }
@@ -74,8 +76,14 @@ namespace Harryanto.CookingGame.Customer
 
             int randomTransform = randomTransformIndex[Random.Range(0, randomTransformIndex.Count)];
 
+            BaseCustomer baseSpawnedCustomer = spawnedCustomer.gameObject.GetComponent<BaseCustomer>();
             _customerList.Add(baseSpawnedCustomer);
             baseSpawnedCustomer.SetDestination(_stallSlotList[randomTransform]);
+            baseSpawnedCustomer.SetCustomerStatus(_customerStatus[randomTransform]);
+            if (OnCustomerSpawned != null)
+            {
+                OnCustomerSpawned(baseSpawnedCustomer);
+            }
             _stallSlotListAlloted[randomTransform] = true;
             _totalCustomerToSpawn--;
         }

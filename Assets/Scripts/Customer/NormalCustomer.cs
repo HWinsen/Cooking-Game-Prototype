@@ -9,6 +9,7 @@ namespace Harryanto.CookingGame.Customer
     {
         private void OnEnable()
         {
+            SetPatienceTimer();
             RandomSpawnIndex = Random.Range(0, SpawnPoint.Length);
             Ordered = false;
         }

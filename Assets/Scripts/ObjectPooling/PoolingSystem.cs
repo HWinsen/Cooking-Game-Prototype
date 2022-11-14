@@ -64,6 +64,28 @@ namespace Harryanto.CookingGame.ObjectPooling
             return outObject;
         }
 
+        // Overload IPoolObjectOnly
+        public IPoolObject CreateObject(IPoolObject objectPrefab)
+        {
+            IPoolObject outObject;
+            if (_spawned < AmountToPool)
+            {
+                outObject = MonoBehaviour.Instantiate(objectPrefab.gameObject).
+                GetComponent<IPoolObject>();
+                outObject.Initial(this);
+                _spawned++;
+            }
+            else
+            {
+                outObject = _storedList[Random.Range(0, _storedList.Count)];
+                _storedList.Remove(outObject);
+            }
+
+            outObject.gameObject.SetActive(true);
+
+            return outObject;
+        }
+
         public void Store(IPoolObject poolObject)
         {
             _storedList.Add((IPoolObject)poolObject);
