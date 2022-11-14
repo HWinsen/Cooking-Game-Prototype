@@ -28,7 +28,7 @@ namespace Harryanto.CookingGame.Cooking
                 // trigger change image on plate
                 for (int i = 0; i < _plates.Length; i++)
                 {
-                    if (!isDonePlating && _plates[i].IsOccupied == false)
+                    if (!isDonePlating && !_plates[i].IsOccupied)
                     {
                         _plates[i].OnDoneCooking(_stoveImage.sprite);
                         isDonePlating = true;

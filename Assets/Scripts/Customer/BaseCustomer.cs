@@ -27,7 +27,7 @@ namespace Harryanto.CookingGame.Customer
         };
         protected int RandomSpawnIndex;
         protected bool Ordered = false;
-        protected GameObject CustomerStatus;
+        public GameObject CustomerStatus { protected set; get; }
         public Transform OrderPanel { protected set; get; }
         protected Image PatienceBarInner;
 
@@ -40,8 +40,11 @@ namespace Harryanto.CookingGame.Customer
         public void SetCustomerStatus(GameObject gameObject)
         {
             CustomerStatus = gameObject;
-            OrderPanel = CustomerStatus.transform.GetChild(0);
-            PatienceBarInner = CustomerStatus.transform.GetChild(1).GetChild(0).GetComponent<Image>();
+            if (CustomerStatus != null)
+            {
+                OrderPanel = CustomerStatus.transform.GetChild(0);
+                PatienceBarInner = CustomerStatus.transform.GetChild(1).GetChild(0).GetComponent<Image>();
+            }
         }
 
         protected void SetPatienceTimer()

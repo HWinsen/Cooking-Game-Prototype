@@ -6,12 +6,7 @@ using UnityEngine.UI;
 
 public class OrderPrefab : PoolObject
 {
-    private Image _image;
-
-    private void Awake()
-    {
-        _image = GetComponent<Image>();
-    }
+    [SerializeField] private Image _image;
 
     public void SetOrderSprite(Sprite orderSprite)
     {

@@ -2,6 +2,7 @@ using Harryanto.CookingGame.Cooking;
 using Harryanto.CookingGame.ObjectPooling;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.U2D;
 
@@ -9,33 +10,50 @@ namespace Harryanto.CookingGame.Customer
 {
     public class CustomerServer : MonoBehaviour
     {
+        public delegate void CustomerServerDelegate();
+        public static event CustomerServerDelegate OnAllCustomerServed;
+
+        public delegate void GameStateDelegate(bool gameState);
+        public static event GameStateDelegate UpdateGameWinState;
+
         [SerializeField] private SpriteAtlas[] _orderSpriteAtlas;
         [SerializeField] private PoolingSystem _orderImagePool = new(11);
         [SerializeField] private OrderPrefab _orderSpritePrefab;
         [SerializeField] private List<Sprite> _orderSprites;
         [SerializeField] private int _maxOrderCount = 3;
-        [SerializeField] private float[] _customerPatiences;
         private Dictionary<BaseCustomer, List<string>> _customerOrderList = new();
+        private int _totalCustomerServed = 0;
+        [SerializeField] private TMP_Text _customerServed;
 
         private void Awake()
         {
-            LoadOrderSprites();
             CustomerSpawner.OnCustomerSpawned += CustomerSpawner_OnCustomerSpawned;
+            BaseCustomer.OnRemoveAllOrder += BaseCustomer_OnRemoveAllOrder;
             Beverage.CheckOrder += CheckOrder;
             Plate.CheckOrder += CheckOrder;
-            BaseCustomer.OnRemoveAllOrder += BaseCustomer_OnRemoveAllOrder;
+            CustomerSpawner.OnStopSpawning += CheckTotalCustomerServed;
+            GameManager.RestartCustomerServer += RestartCustomerServer;
+            LoadOrderSprites();
         }
 
         private void OnDestroy()
         {
             CustomerSpawner.OnCustomerSpawned -= CustomerSpawner_OnCustomerSpawned;
+            BaseCustomer.OnRemoveAllOrder -= BaseCustomer_OnRemoveAllOrder;
             Beverage.CheckOrder -= CheckOrder;
             Plate.CheckOrder -= CheckOrder;
-            BaseCustomer.OnRemoveAllOrder -= BaseCustomer_OnRemoveAllOrder;
+            CustomerSpawner.OnStopSpawning -= CheckTotalCustomerServed;
+            GameManager.RestartCustomerServer -= RestartCustomerServer;
+        }
+
+        private void Start()
+        {
+            _customerServed.SetText($"Customer Served: {_totalCustomerServed:F0}");
         }
 
         private void CustomerSpawner_OnCustomerSpawned(BaseCustomer baseCustomer)
         {
+            //List<string> baseCustomerOrder = InsertOrder(baseCustomer.OrderPanel);
             _customerOrderList.Add(baseCustomer, InsertOrder(baseCustomer.OrderPanel));
         }
 
@@ -104,6 +122,9 @@ namespace Harryanto.CookingGame.Customer
                             }
                         }
                     }
+
+                    _totalCustomerServed++;
+                    _customerServed.SetText($"Customer Served: {_totalCustomerServed:F0}");
                 }
             }
         }
@@ -134,7 +155,6 @@ namespace Harryanto.CookingGame.Customer
                 spawnedOrderGameObject.transform.SetParent(orderPanel, false);
                 orderNames.Add(spawnedOrderGameObject.name);
             }
-
             return orderNames;
         }
 
@@ -158,6 +178,33 @@ namespace Harryanto.CookingGame.Customer
             }
 
             _customerOrderList.Remove(baseCustomer);
+        }
+
+        private void CheckTotalCustomerServed(int totalCustomerToSpawn)
+        {
+            if (_totalCustomerServed >= totalCustomerToSpawn)
+            {
+                UpdateGameWinState(true);
+            }
+            else
+            {
+                UpdateGameWinState(false);
+            }
+
+            //_totalCustomerServed = 0;
+        }
+
+        private void RestartCustomerServer()
+        {
+            _totalCustomerServed = 0;
+            _customerServed.SetText($"Customer Served: {_totalCustomerServed:F0}");
+
+            List<BaseCustomer> customerTempList = new(_customerOrderList.Keys);
+            foreach (BaseCustomer customer in customerTempList)
+            {
+                BaseCustomer_OnRemoveAllOrder(customer, customer.OrderPanel);
+            }
+            //_customerOrderList.Clear();
         }
     }
 }

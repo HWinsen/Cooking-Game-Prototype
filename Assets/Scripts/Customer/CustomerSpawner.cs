@@ -1,6 +1,7 @@
 using Harryanto.CookingGame.ObjectPooling;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 namespace Harryanto.CookingGame.Customer
@@ -10,9 +11,14 @@ namespace Harryanto.CookingGame.Customer
         public delegate void CustomerSpawnerDelegate(BaseCustomer baseCustomer);
         public static event CustomerSpawnerDelegate OnCustomerSpawned;
 
+        public delegate void WinningConditionDelegate(int totalCustomerToSpawn);
+        public static event WinningConditionDelegate OnStopSpawning;
+
         private PoolingSystem _customerPool = new(10);
         [SerializeField] private BaseCustomer[] _customerPrefabList;
-        [SerializeField] private int _totalCustomerToSpawn;
+        public int TotalCustomerToSpawn;
+        private int _customerNeedToBeServed;
+        [SerializeField] private TMP_Text _customerLeft;
         [SerializeField] private float _spawnDuration;
         private Vector3[] _spawnPoint =
         {
@@ -24,15 +30,24 @@ namespace Harryanto.CookingGame.Customer
         private bool[] _stallSlotListAlloted = new bool[4];
         private List<BaseCustomer> _customerList = new();
         private float _spawnTimer = 0f;
+        private bool _isSpawning = true;
 
         private void OnEnable()
         {
             BaseCustomer.OnFinishedOrdered += OnFinishedOrdered;
+            GameManager.SetCustomerSpawnerState += SetSpawnerState;
+            GameManager.AddExtraCustomerToSpawn += AddExtraCustomerToSpawn;
+            GameManager.RestartCustomerSpawner += RestartCustomerSpawner;
+            _customerNeedToBeServed = TotalCustomerToSpawn;
+            _customerLeft.SetText($"Customer Left: {TotalCustomerToSpawn:F0}");
         }
 
         private void OnDisable()
         {
             BaseCustomer.OnFinishedOrdered -= OnFinishedOrdered;
+            GameManager.SetCustomerSpawnerState -= SetSpawnerState;
+            GameManager.AddExtraCustomerToSpawn -= AddExtraCustomerToSpawn;
+            GameManager.RestartCustomerSpawner -= RestartCustomerSpawner;
         }
 
         private void Start()
@@ -43,16 +58,19 @@ namespace Harryanto.CookingGame.Customer
 
         private void FixedUpdate()
         {
-            if (_totalCustomerToSpawn > 0 && _customerList.Count < _customerList.Capacity)
+            if (_isSpawning)
             {
-                if (_spawnTimer <= _spawnDuration)
+                if (TotalCustomerToSpawn > 0 && _customerList.Count < _customerList.Capacity)
                 {
-                    _spawnTimer += Time.fixedDeltaTime;
-                }
-                else
-                {
-                    SpawnCustomer();
-                    _spawnTimer = 0f;
+                    if (_spawnTimer <= _spawnDuration)
+                    {
+                        _spawnTimer += Time.fixedDeltaTime;
+                    }
+                    else
+                    {
+                        SpawnCustomer();
+                        _spawnTimer = 0f;
+                    }
                 }
             }
         }
@@ -80,12 +98,10 @@ namespace Harryanto.CookingGame.Customer
             _customerList.Add(baseSpawnedCustomer);
             baseSpawnedCustomer.SetDestination(_stallSlotList[randomTransform]);
             baseSpawnedCustomer.SetCustomerStatus(_customerStatus[randomTransform]);
-            if (OnCustomerSpawned != null)
-            {
-                OnCustomerSpawned(baseSpawnedCustomer);
-            }
             _stallSlotListAlloted[randomTransform] = true;
-            _totalCustomerToSpawn--;
+            TotalCustomerToSpawn--;
+            _customerLeft.SetText($"Customer Left: {TotalCustomerToSpawn:F0}");
+            OnCustomerSpawned(baseSpawnedCustomer);
         }
 
         private void OnFinishedOrdered(BaseCustomer baseFinishedCustomer, Transform destination)
@@ -93,6 +109,39 @@ namespace Harryanto.CookingGame.Customer
             int index = System.Array.IndexOf(_stallSlotList, destination);
             _stallSlotListAlloted[index] = false;
             _customerList.Remove(baseFinishedCustomer);
+        }
+
+        private void SetSpawnerState(bool spawnerState)
+        {
+            _isSpawning = spawnerState;
+
+            if (!_isSpawning)
+            {
+                OnStopSpawning(_customerNeedToBeServed);
+            }
+        }
+
+        private void AddExtraCustomerToSpawn(int amountToSpawn)
+        {
+            TotalCustomerToSpawn = amountToSpawn;
+            _customerNeedToBeServed = TotalCustomerToSpawn;
+            _customerLeft.SetText($"Customer Left: {TotalCustomerToSpawn:F0}");
+        }
+
+        private void RestartCustomerSpawner()
+        {
+            _spawnTimer = 0f;
+
+            for (int i = 0; i < _customerList.Count; i++)
+            {
+                _customerList[i].CustomerStatus.SetActive(false);
+                _customerList[i].StoreToPool();
+            }
+
+            for (int i = 0; i < _stallSlotListAlloted.Length; i++)
+            {
+                _stallSlotListAlloted[i] = false;
+            }
         }
     }
 }
