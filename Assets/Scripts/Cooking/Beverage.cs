@@ -48,7 +48,6 @@ namespace Harryanto.CookingGame.Cooking
                 }
                 else
                 {
-                    //IsCooking = false;
                     _cookTimer = 0f;
                     _beverageTimer.fillAmount = _cookTimer;
                     SpawnGlass();
@@ -73,7 +72,6 @@ namespace Harryanto.CookingGame.Cooking
         private void Serve()
         {
             Glass removedGlass = _glasses.Peek();
-            //CheckOrder(removedGlass.GetComponent<Image>().sprite.name);
             bool isOrderTrue = CheckOrder(removedGlass.name+"(Clone)");
             if (isOrderTrue)
             {

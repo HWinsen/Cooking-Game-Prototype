@@ -11,18 +11,10 @@ namespace Harryanto.CookingGame.Cooking
         public delegate bool PlateDelegate(string orderName);
         public static event PlateDelegate CheckOrder;
 
-        //private Button _plateButton;
         [SerializeField] private Image _plateImage;
         [SerializeField] private SpriteAtlas _donutSpriteAtlas;
         public bool IsOccupied { private set; get; }
         public bool IsPouredWithTopping { private set; get; }
-
-        //protected override void Start()
-        //{
-        //    base.Start();
-        //    _plateImage = GetComponent<Image>();
-        //    //_plateButton = GetComponent<Button>();
-        //}
 
         protected override void StartCooking()
         {

@@ -40,6 +40,7 @@ namespace Harryanto.CookingGame.LevelSelect
                     break;
                 }
             }
+            SaveDataController.Instance.Save();
         }
     }
 }

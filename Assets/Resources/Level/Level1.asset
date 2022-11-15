@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Level1
   m_EditorClassIdentifier: 
   MaximumCustomerToSpawn: 10
-  IsLevelClear: 010100
+  IsLevelClear: 000000
   ConfigureMaximumCustomerToSpawn: 0

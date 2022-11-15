@@ -10,7 +10,7 @@ namespace Harryanto.CookingGame.LevelSelect
     {
         public int MaximumCustomerToSpawn;
 
-        public bool[] IsLevelClear =
+        [HideInInspector] public bool[] IsLevelClear =
         {
             false,
             false,

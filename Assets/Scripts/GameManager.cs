@@ -122,8 +122,8 @@ public class GameManager : MonoBehaviour
 
         if (_isWin)
         {
-            GoToLevelSelect();
             LevelController.Instance.SetLevelClear();
+            GoToLevelSelect();
         }
         else
         {
