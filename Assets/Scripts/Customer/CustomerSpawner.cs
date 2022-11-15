@@ -1,3 +1,4 @@
+using Harryanto.CookingGame.LevelSelect;
 using Harryanto.CookingGame.ObjectPooling;
 using System.Collections;
 using System.Collections.Generic;
@@ -38,6 +39,7 @@ namespace Harryanto.CookingGame.Customer
             GameManager.SetCustomerSpawnerState += SetSpawnerState;
             GameManager.AddExtraCustomerToSpawn += AddExtraCustomerToSpawn;
             GameManager.RestartCustomerSpawner += RestartCustomerSpawner;
+            TotalCustomerToSpawn = LevelController.CurrentLevelMaximumCustomerToSpawn;
             _customerNeedToBeServed = TotalCustomerToSpawn;
             _customerLeft.SetText($"Customer Left: {TotalCustomerToSpawn:F0}");
         }
