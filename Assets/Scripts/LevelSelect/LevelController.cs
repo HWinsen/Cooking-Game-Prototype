@@ -21,22 +21,22 @@ namespace Harryanto.CookingGame.LevelSelect
             }
         }
 
-        private LevelScriptableObject _levelScriptableObject;
-        [HideInInspector] public static int CurrentLevelMaximumCustomerToSpawn { private set; get; }
+        public LevelScriptableObject Level { private set; get; }
+        [HideInInspector] public int CurrentLevelMaximumCustomerToSpawn { private set; get; }
 
         public void SetLevelScriptableObject(LevelScriptableObject levelScriptableObject)
         {
-            _levelScriptableObject = levelScriptableObject;
-            CurrentLevelMaximumCustomerToSpawn = _levelScriptableObject.MaximumCustomerToSpawn;
+            Level = levelScriptableObject;
+            CurrentLevelMaximumCustomerToSpawn = Level.MaximumCustomerToSpawn;
         }
 
         public void SetLevelClear()
         {
-            for (int i = 0; i < _levelScriptableObject.IsLevelClear.Length; i++)
+            for (int i = 0; i < Level.IsLevelClear.Length; i++)
             {
-                if (!_levelScriptableObject.IsLevelClear[i])
+                if (!Level.IsLevelClear[i])
                 {
-                    _levelScriptableObject.IsLevelClear[i] = true;
+                    Level.IsLevelClear[i] = true;
                     break;
                 }
             }

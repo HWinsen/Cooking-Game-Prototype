@@ -32,6 +32,7 @@ namespace Harryanto.CookingGame.Customer
         private List<BaseCustomer> _customerList = new();
         private float _spawnTimer = 0f;
         private bool _isSpawning = true;
+        private bool _isTrainingLevel;
 
         private void OnEnable()
         {
@@ -40,9 +41,9 @@ namespace Harryanto.CookingGame.Customer
             GameManager.AddExtraCustomerToSpawn += AddExtraCustomerToSpawn;
             GameManager.RestartCustomerSpawner += RestartCustomerSpawner;
 
-            if (LevelController.CurrentLevelMaximumCustomerToSpawn > 0)
+            if (LevelController.Instance.CurrentLevelMaximumCustomerToSpawn > 0)
             {
-                TotalCustomerToSpawn = LevelController.CurrentLevelMaximumCustomerToSpawn;
+                TotalCustomerToSpawn = LevelController.Instance.CurrentLevelMaximumCustomerToSpawn;
             }
             else
             {
@@ -50,6 +51,11 @@ namespace Harryanto.CookingGame.Customer
             }
             _customerNeedToBeServed = TotalCustomerToSpawn;
             _customerLeft.SetText($"Customer Left: {TotalCustomerToSpawn:F0}");
+
+            if (LevelController.Instance.Level.name == "Level1" && !LevelController.Instance.Level.IsLevelClear[0])
+            {
+                _isTrainingLevel = true;
+            }
         }
 
         private void OnDisable()
@@ -71,7 +77,8 @@ namespace Harryanto.CookingGame.Customer
         {
             if (_isSpawning)
             {
-                if (TotalCustomerToSpawn > 0 && _customerList.Count < _customerList.Capacity)
+                if ((TotalCustomerToSpawn > 0 || _isTrainingLevel) &&
+                    _customerList.Count < _customerList.Capacity)
                 {
                     if (_spawnTimer <= _spawnDuration)
                     {
