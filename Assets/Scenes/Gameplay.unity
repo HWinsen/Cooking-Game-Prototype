@@ -1627,7 +1627,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _customerPrefabList:
   - {fileID: 6043586155466282093, guid: a9d22ca1dac46d244a1ecaf9b8e66219, type: 3}
-  TotalCustomerToSpawn: 5
   _customerLeft: {fileID: 1212643431}
   _spawnDuration: 2
   _stallSlotList:
@@ -2192,7 +2191,6 @@ MonoBehaviour:
   _orderSpritePrefab: {fileID: 6862582639404221314, guid: 5c04b309cbc45dd41846ed9c3161101d, type: 3}
   _orderSprites: []
   _maxOrderCount: 3
-  _customerPatiences: []
   _customerServed: {fileID: 255611841}
 --- !u!4 &773317521
 Transform:

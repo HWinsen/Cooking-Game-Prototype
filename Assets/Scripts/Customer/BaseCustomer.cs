@@ -11,8 +11,9 @@ namespace Harryanto.CookingGame.Customer
         public delegate void CustomerDelegate(BaseCustomer baseCustomer, Transform destination);
         public static event CustomerDelegate OnFinishedOrdered;
 
-        public delegate void RemoveOrderDelegate(BaseCustomer baseCustomer, Transform orderPanel);
-        public static event RemoveOrderDelegate OnRemoveAllOrder;
+        public delegate void OrderDelegate(BaseCustomer baseCustomer, Transform orderPanel);
+        public static event OrderDelegate OnInsertingOrder;
+        public static event OrderDelegate OnRemoveAllOrder;
 
         public float PatienceDuration = 10f;
         public float PatienceTimer { private set; get; }
@@ -66,6 +67,10 @@ namespace Harryanto.CookingGame.Customer
 
         protected virtual void Order()
         {
+            if (!Ordered)
+            {
+                OnInsertingOrder(this, OrderPanel);
+            }
             Ordered = true;
             CustomerStatus.SetActive(true);
             PatienceBarInner.fillAmount = PatienceTimer / PatienceDuration;

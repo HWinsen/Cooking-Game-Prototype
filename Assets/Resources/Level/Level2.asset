@@ -12,4 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51d341d3bf4ed364faa4126cdc96cb3d, type: 3}
   m_Name: Level2
   m_EditorClassIdentifier: 
+  MaximumCustomerToSpawn: 15
   IsLevelClear: 000000
+  ConfigureMaximumCustomerToSpawn: 1

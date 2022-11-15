@@ -10,14 +10,11 @@ namespace Harryanto.CookingGame.Customer
 {
     public class CustomerServer : MonoBehaviour
     {
-        public delegate void CustomerServerDelegate();
-        public static event CustomerServerDelegate OnAllCustomerServed;
-
         public delegate void GameStateDelegate(bool gameState);
         public static event GameStateDelegate UpdateGameWinState;
 
         [SerializeField] private SpriteAtlas[] _orderSpriteAtlas;
-        [SerializeField] private PoolingSystem _orderImagePool = new(11);
+        [SerializeField] private PoolingSystem _orderImagePool = new(12);
         [SerializeField] private OrderPrefab _orderSpritePrefab;
         [SerializeField] private List<Sprite> _orderSprites;
         [SerializeField] private int _maxOrderCount = 3;
@@ -28,6 +25,7 @@ namespace Harryanto.CookingGame.Customer
         private void Awake()
         {
             CustomerSpawner.OnCustomerSpawned += CustomerSpawner_OnCustomerSpawned;
+            BaseCustomer.OnInsertingOrder += BaseCustomer_OnInsertingOrder;
             BaseCustomer.OnRemoveAllOrder += BaseCustomer_OnRemoveAllOrder;
             Beverage.CheckOrder += CheckOrder;
             Plate.CheckOrder += CheckOrder;
@@ -39,6 +37,7 @@ namespace Harryanto.CookingGame.Customer
         private void OnDestroy()
         {
             CustomerSpawner.OnCustomerSpawned -= CustomerSpawner_OnCustomerSpawned;
+            BaseCustomer.OnInsertingOrder -= BaseCustomer_OnInsertingOrder;
             BaseCustomer.OnRemoveAllOrder -= BaseCustomer_OnRemoveAllOrder;
             Beverage.CheckOrder -= CheckOrder;
             Plate.CheckOrder -= CheckOrder;
@@ -53,12 +52,19 @@ namespace Harryanto.CookingGame.Customer
 
         private void CustomerSpawner_OnCustomerSpawned(BaseCustomer baseCustomer)
         {
-            //List<string> baseCustomerOrder = InsertOrder(baseCustomer.OrderPanel);
-            _customerOrderList.Add(baseCustomer, InsertOrder(baseCustomer.OrderPanel));
+            //_customerOrderList.Add(baseCustomer, InsertOrder(baseCustomer.OrderPanel));
+            _customerOrderList.Add(baseCustomer, new());
         }
 
-        private void CheckOrder(string orderName)
+        private void BaseCustomer_OnInsertingOrder(BaseCustomer baseCustomer, Transform orderPanel)
         {
+            _customerOrderList[baseCustomer] = InsertOrder(orderPanel);
+        }
+
+        private bool CheckOrder(string orderName)
+        {
+            bool isOrderTrue = false;
+
             if (_customerOrderList.Count >= 1)
             {
                 //get customers with match order
@@ -119,14 +125,17 @@ namespace Harryanto.CookingGame.Customer
                             else
                             {
                                 lowestPatienceCustomer.ZeroPatience();
+                                _totalCustomerServed++;
+                                _customerServed.SetText($"Customer Served: {_totalCustomerServed:F0}");
                             }
                         }
                     }
 
-                    _totalCustomerServed++;
-                    _customerServed.SetText($"Customer Served: {_totalCustomerServed:F0}");
+                    isOrderTrue = true;
                 }
             }
+
+            return isOrderTrue;
         }
 
         private void LoadOrderSprites()
@@ -190,8 +199,6 @@ namespace Harryanto.CookingGame.Customer
             {
                 UpdateGameWinState(false);
             }
-
-            //_totalCustomerServed = 0;
         }
 
         private void RestartCustomerServer()
@@ -204,7 +211,6 @@ namespace Harryanto.CookingGame.Customer
             {
                 BaseCustomer_OnRemoveAllOrder(customer, customer.OrderPanel);
             }
-            //_customerOrderList.Clear();
         }
     }
 }

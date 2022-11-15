@@ -9,7 +9,7 @@ namespace Harryanto.CookingGame.LevelSelect
 {
     public class LevelManager : MonoBehaviour
     {
-        private LevelController _levelController = new();
+        [SerializeField] private LevelController _levelController;
 
         private LevelScriptableObject[] _levelScriptableObjects;
         [SerializeField] private Button _levelButtonPrefab;
@@ -17,7 +17,6 @@ namespace Harryanto.CookingGame.LevelSelect
         [SerializeField] private GameObject _configurePanel;
         [SerializeField] private TMP_InputField _maximumCustomerToSpawn;
         [SerializeField] private Button _startLevelButton;
-        private List<Button> _levelButtonList = new();
 
         private void Start()
         {
@@ -27,8 +26,6 @@ namespace Harryanto.CookingGame.LevelSelect
             {
                 int j = i;
                 Button tempButton = Instantiate(_levelButtonPrefab, _levelButtonParent, false);
-                //tempButton.GetComponentInChildren<TMP_Text>().SetText(_levelScriptableObjects[i].name);
-                //tempButton.name = _levelScriptableObjects[i].name;
                 for (int k = 0; k < _levelScriptableObjects[i].IsLevelClear.Length; k++)
                 {
                     if (!_levelScriptableObjects[i].IsLevelClear[k])
@@ -42,7 +39,6 @@ namespace Harryanto.CookingGame.LevelSelect
                 {
                     OpenLevel(j);
                 });
-                _levelButtonList.Add(tempButton);
             }
         }
 
