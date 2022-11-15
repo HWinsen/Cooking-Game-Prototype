@@ -5214,7 +5214,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d805c1cfb3883294d82bc0156757ead8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _gameDuration: 10
+  _gameDuration: 90
   _endGamePanel: {fileID: 169988432}
   _gameOverPanel: {fileID: 548781121}
   _restartPanel: {fileID: 256947758}

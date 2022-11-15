@@ -20,7 +20,11 @@ namespace Harryanto.CookingGame.LevelSelect
 
         private void Start()
         {
-            _levelScriptableObjects = Resources.LoadAll<LevelScriptableObject>("Level");
+            QualitySettings.vSyncCount = 0;
+            Application.targetFrameRate = 60;
+
+            //_levelScriptableObjects = Resources.LoadAll<LevelScriptableObject>("Level");
+            _levelScriptableObjects = SaveDataController.Instance.Load();
 
             for (int i = 0; i < _levelScriptableObjects.Length; i++)
             {
