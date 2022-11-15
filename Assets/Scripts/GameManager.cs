@@ -1,4 +1,5 @@
 using Harryanto.CookingGame.Customer;
+using Harryanto.CookingGame.LevelSelect;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -50,13 +51,13 @@ public class GameManager : MonoBehaviour
         _restartButtonOnRestartPanel.onClick.AddListener(RestartGame);
         _backButtonOnRestartPanel.onClick.AddListener(CloseRestartPanel);
 
-        CustomerServer.OnAllCustomerServed += CustomerServer_OnAllCustomerServed;
         CustomerServer.UpdateGameWinState += CustomerServer_UpdateGameWinState;
+
+        Time.timeScale = 1;
     }
 
     private void OnDestroy()
     {
-        CustomerServer.OnAllCustomerServed -= CustomerServer_OnAllCustomerServed;
         CustomerServer.UpdateGameWinState -= CustomerServer_UpdateGameWinState;
     }
 
@@ -121,6 +122,7 @@ public class GameManager : MonoBehaviour
 
         if (_isWin)
         {
+            LevelController.Instance.SetLevelClear();
             GoToLevelSelect();
         }
         else
@@ -128,12 +130,5 @@ public class GameManager : MonoBehaviour
             _endGamePanel.SetActive(true);
             _gameOverPanel.SetActive(true);
         }
-    }
-
-    private void CustomerServer_OnAllCustomerServed()
-    {
-        _endGamePanel.SetActive(true);
-        _gameOverPanel.SetActive(true);
-        SetCustomerSpawnerState(false);
     }
 }

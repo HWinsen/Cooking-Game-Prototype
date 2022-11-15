@@ -1,3 +1,4 @@
+using Harryanto.CookingGame.LevelSelect;
 using Harryanto.CookingGame.ObjectPooling;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,7 +17,7 @@ namespace Harryanto.CookingGame.Customer
 
         private PoolingSystem _customerPool = new(10);
         [SerializeField] private BaseCustomer[] _customerPrefabList;
-        public int TotalCustomerToSpawn;
+        private int TotalCustomerToSpawn;
         private int _customerNeedToBeServed;
         [SerializeField] private TMP_Text _customerLeft;
         [SerializeField] private float _spawnDuration;
@@ -31,6 +32,7 @@ namespace Harryanto.CookingGame.Customer
         private List<BaseCustomer> _customerList = new();
         private float _spawnTimer = 0f;
         private bool _isSpawning = true;
+        private bool _isTrainingLevel;
 
         private void OnEnable()
         {
@@ -38,8 +40,22 @@ namespace Harryanto.CookingGame.Customer
             GameManager.SetCustomerSpawnerState += SetSpawnerState;
             GameManager.AddExtraCustomerToSpawn += AddExtraCustomerToSpawn;
             GameManager.RestartCustomerSpawner += RestartCustomerSpawner;
+
+            if (LevelController.Instance.CurrentLevelMaximumCustomerToSpawn > 0)
+            {
+                TotalCustomerToSpawn = LevelController.Instance.CurrentLevelMaximumCustomerToSpawn;
+            }
+            else
+            {
+                TotalCustomerToSpawn = 10;
+            }
             _customerNeedToBeServed = TotalCustomerToSpawn;
             _customerLeft.SetText($"Customer Left: {TotalCustomerToSpawn:F0}");
+
+            if (LevelController.Instance.Level.name == "Level1" && !LevelController.Instance.Level.IsLevelClear[0])
+            {
+                _isTrainingLevel = true;
+            }
         }
 
         private void OnDisable()
@@ -53,21 +69,24 @@ namespace Harryanto.CookingGame.Customer
         private void Start()
         {
             _customerList.Capacity = 4;
+            TotalCustomerToSpawn--;
             SpawnCustomer();
         }
 
-        private void FixedUpdate()
+        private void Update()
         {
             if (_isSpawning)
             {
-                if (TotalCustomerToSpawn > 0 && _customerList.Count < _customerList.Capacity)
+                if ((TotalCustomerToSpawn > 0 || _isTrainingLevel) &&
+                    _customerList.Count < _customerList.Capacity)
                 {
                     if (_spawnTimer <= _spawnDuration)
                     {
-                        _spawnTimer += Time.fixedDeltaTime;
+                        _spawnTimer += Time.deltaTime;
                     }
                     else
                     {
+                        TotalCustomerToSpawn--;
                         SpawnCustomer();
                         _spawnTimer = 0f;
                     }
@@ -99,7 +118,6 @@ namespace Harryanto.CookingGame.Customer
             baseSpawnedCustomer.SetDestination(_stallSlotList[randomTransform]);
             baseSpawnedCustomer.SetCustomerStatus(_customerStatus[randomTransform]);
             _stallSlotListAlloted[randomTransform] = true;
-            TotalCustomerToSpawn--;
             _customerLeft.SetText($"Customer Left: {TotalCustomerToSpawn:F0}");
             OnCustomerSpawned(baseSpawnedCustomer);
         }
@@ -137,6 +155,8 @@ namespace Harryanto.CookingGame.Customer
                 _customerList[i].CustomerStatus.SetActive(false);
                 _customerList[i].StoreToPool();
             }
+
+            _customerList.Clear();
 
             for (int i = 0; i < _stallSlotListAlloted.Length; i++)
             {

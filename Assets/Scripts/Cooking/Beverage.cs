@@ -8,7 +8,7 @@ namespace Harryanto.CookingGame.Cooking
 {
     public class Beverage : Cook
     {
-        public delegate void BeverageDelegate(string orderName);
+        public delegate bool BeverageDelegate(string orderName);
         public static event BeverageDelegate CheckOrder;
 
         private PoolingSystem _glassPool;
@@ -48,7 +48,6 @@ namespace Harryanto.CookingGame.Cooking
                 }
                 else
                 {
-                    //IsCooking = false;
                     _cookTimer = 0f;
                     _beverageTimer.fillAmount = _cookTimer;
                     SpawnGlass();
@@ -73,10 +72,12 @@ namespace Harryanto.CookingGame.Cooking
         private void Serve()
         {
             Glass removedGlass = _glasses.Peek();
-            //CheckOrder(removedGlass.GetComponent<Image>().sprite.name);
-            CheckOrder(removedGlass.name+"(Clone)");
-            removedGlass.StoreToPool();
-            _glasses.Dequeue();
+            bool isOrderTrue = CheckOrder(removedGlass.name+"(Clone)");
+            if (isOrderTrue)
+            {
+                removedGlass.StoreToPool();
+                _glasses.Dequeue();
+            }
         }
     }
 }
